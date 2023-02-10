@@ -79,7 +79,6 @@ async function handlePostCreate(req, res, next) {
     console.log(err);
     res.sendStatus(400);
   };
-  next();
 }
 
 async function handlePostValidate(req, res, next) {
@@ -115,15 +114,16 @@ async function handlePostValidate(req, res, next) {
     console.log(err);
     res.sendStatus(400);
   };
-  next();
 }
 
 async function handleGetUsers(req, res, next) {
   try {
+    console.log(req);
     let { q } = req.query;
     fetch(git.search + q).then(
       (resp) => resp.json()).then(
         (data) => {
+          console.log(data);
           res.status(200).send(data)
         }
       ).catch((error) => {
@@ -134,7 +134,6 @@ async function handleGetUsers(req, res, next) {
     console.log(err);
     res.sendStatus(400);
   };
-  next();
 }
 
 async function handleGetUserById(req, res, next) {
@@ -154,7 +153,6 @@ async function handleGetUserById(req, res, next) {
     console.log(err);
     res.sendStatus(400);
   };
-  next();
 }
 
 async function handlePostLike(req, res, next) {
@@ -164,7 +162,6 @@ async function handlePostLike(req, res, next) {
     console.log(err);
     res.sendStatus(400);
   };
-  next();
 }
 
 async function handleGetUserProfileByPhoneNumber(req, res, next) {
@@ -185,5 +182,4 @@ async function handleGetUserProfileByPhoneNumber(req, res, next) {
     console.log(err);
     res.sendStatus(400);
   };
-  next();
 }
