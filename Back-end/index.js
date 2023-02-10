@@ -46,25 +46,25 @@ app.listen(PORT, () => console.log("Server running on port " + PORT));
 
 
 
-app.get("/", (req, res, next) => res.sendStatus(400));
+app.get("/", cors(corsOptionsDelegate), (req, res, next) => res.sendStatus(400));
 
 // (POST) CreateNewAccessCode
-app.post("/create", (req, res, next) => handlePostCreate(req, res, next))
+app.post("/create", cors(corsOptionsDelegate), (req, res, next) => handlePostCreate(req, res, next))
 
 // (POST) ValidateAccessCode
-app.post("/validate", (req, res, next) => handlePostValidate(req, res, next))
+app.post("/validate", cors(corsOptionsDelegate), (req, res, next) => handlePostValidate(req, res, next))
 
 // (GET) searchGithubUsers
-app.get("/users", (req, res, next) => handleGetUsers(req, res, next));
+app.get("/users", cors(corsOptionsDelegate), (req, res, next) => handleGetUsers(req, res, next));
 
 // (GET) findGithubUserProfile
-app.get("/user/:userID", (req, res, next) => handleGetUserById(req, res, next));
+app.get("/user/:userID", cors(corsOptionsDelegate), (req, res, next) => handleGetUserById(req, res, next));
 
 //(POST) likeGithubUser
-app.post("/like", (req, res, next) => handlePostLike(req, res, next));
+app.post("/like", cors(corsOptionsDelegate), (req, res, next) => handlePostLike(req, res, next));
 
 // (GET) getUserProfile
-app.get("/profile", (req, res, next) => handleGetUserProfileByPhoneNumber(req, res, next));
+app.get("/profile", cors(corsOptionsDelegate), (req, res, next) => handleGetUserProfileByPhoneNumber(req, res, next));
 
 // Function here
 async function handlePostCreate(req, res, next) {
