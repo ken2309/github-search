@@ -46,25 +46,53 @@ const PORT = process.env.PORT || 8080
 app.listen(PORT, () => console.log("Server running on port " + PORT));
 
 
+app.head("/", cors(), (req, res) => {
+  console.info("HEAD /simple-cors");
+  res.sendStatus(204);
+});
 
-app.get("/", (req, res, next) => res.sendStatus(400));
+app.get("/", (req, res, next) => res.send(200).send("<h1>Github search engine</h1>"));
 
 // (POST) CreateNewAccessCode
+app.head("/create", cors(), (req, res) => {
+  console.info("HEAD /simple-cors");
+  res.sendStatus(204);
+});
 app.post("/create", (req, res, next) => handlePostCreate(req, res, next))
 
 // (POST) ValidateAccessCode
+app.head("/validate", cors(), (req, res) => {
+  console.info("HEAD /simple-cors");
+  res.sendStatus(204);
+});
 app.post("/validate", (req, res, next) => handlePostValidate(req, res, next))
 
 // (GET) searchGithubUsers
+app.head("/users", cors(), (req, res) => {
+  console.info("HEAD /simple-cors");
+  res.sendStatus(204);
+});
 app.get("/users", (req, res, next) => handleGetUsers(req, res, next));
 
 // (GET) findGithubUserProfile
+app.head("/user/:userID", cors(), (req, res) => {
+  console.info("HEAD /simple-cors");
+  res.sendStatus(204);
+});
 app.get("/user/:userID", (req, res, next) => handleGetUserById(req, res, next));
 
 //(POST) likeGithubUser
+app.head("/like", cors(), (req, res) => {
+  console.info("HEAD /simple-cors");
+  res.sendStatus(204);
+});
 app.post("/like", (req, res, next) => handlePostLike(req, res, next));
 
 // (GET) getUserProfile
+app.head("/profile", cors(), (req, res) => {
+  console.info("HEAD /simple-cors");
+  res.sendStatus(204);
+});
 app.get("/profile", (req, res, next) => handleGetUserProfileByPhoneNumber(req, res, next));
 
 // Function here
