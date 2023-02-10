@@ -1,0 +1,12 @@
+.main{
+  margin-top: 10%;
+  text-align: center;
+}
+.main>h1{
+  padding-bottom: 20px;
+}
+.phone_field{
+  margin: auto;
+  height: fit-content;
+  width: fit-content;
+}
