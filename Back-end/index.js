@@ -1,7 +1,24 @@
 const express = require("express");
 const app = express();
+const cors = require('cors');
 const { sendSMS } = require('./sms');
 const { git, regex } = require('./constant');
+
+// start Cors config 
+var allowlist = ['http://localhost:3000', 'https://github-search-pi.vercel.app/']
+var corsOptionsDelegate = function (req, callback) {
+  var corsOptions;
+  if (allowlist.indexOf(req.header('Origin')) !== -1) {
+    corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+  } else {
+    corsOptions = { origin: false } // disable CORS for this request
+  }
+  callback(null, corsOptions) // callback expects two parameters: error and options
+}
+
+// end Cors config 
+
+
 // start firebase config
 const admin = require("firebase-admin");
 const credentials = require("./key.fiebase.json");
