@@ -56,7 +56,7 @@ export default function Index() {
       console.log(phone,token);
       const res = await authApi.sendValidationCode({ phoneNumber: phone.trim().replaceAll(" ", '').slice(1), accessCode: token });
       console.log("islogin", res);
-      if(res.status === '200'){
+      if(res.status == '200'){
         setUser(res.data);
         return navigate("/");
       }
