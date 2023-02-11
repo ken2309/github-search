@@ -1,28 +1,10 @@
-import { useContext, useState } from "react";
-import Container from '@mui/material/Container';
-import LoginPage from './pages/login';
-import Main from './pages/main';
-import AppProvider from './context/AppProvider';
 import './App.css';
-
+import AppProvider from './AppProvider';
+import RouterConfig from './route';
 function App() {
-  const isLogin = false;
   return (
     <AppProvider>
-        {
-          isLogin
-            ?
-            <Main />
-            :
-            <div className='main'>
-              <h1>
-                Github project searching tool
-              </h1>
-              <div className="phone_field">
-                <LoginPage />
-              </div>
-            </div>
-        }
+      <RouterConfig />
     </AppProvider>
   );
 }

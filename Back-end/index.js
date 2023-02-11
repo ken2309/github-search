@@ -54,11 +54,11 @@ app.head("/", cors(), (req, res) => {
 app.get("/", (req, res, next) => res.send(200).send("<h1>Github search engine</h1>"));
 
 // (POST) CreateNewAccessCode
-app.head("/create", cors(), (req, res) => {
+app.head("/auth", cors(), (req, res) => {
   console.info("HEAD /simple-cors");
   res.sendStatus(204);
 });
-app.post("/create", (req, res, next) => handlePostCreate(req, res, next))
+app.post("/auth", (req, res, next) => handlePostCreate(req, res, next))
 
 // (POST) ValidateAccessCode
 app.head("/validate", cors(), (req, res) => {
@@ -87,6 +87,7 @@ app.head("/like", cors(), (req, res) => {
   res.sendStatus(204);
 });
 app.post("/like", (req, res, next) => handlePostLike(req, res, next));
+app.post("/unlike", (req, res, next) => handlePostUnLike(req, res, next));
 
 // (GET) getUserProfile
 app.head("/profile", cors(), (req, res) => {
@@ -98,23 +99,32 @@ app.get("/profile", (req, res, next) => handleGetUserProfileByPhoneNumber(req, r
 // Function here
 async function handlePostCreate(req, res, next) {
   try {
-    console.log(req);
     let { phoneNumber } = req.body;
     if (phoneNumber) {
       if (phoneNumber.match(regex)) {
         let digitNumber = Math.floor(100000 + Math.random() * 900000);
         if (phoneNumber.startsWith('0')) {
-          phoneNumber = '84' + phoneNumber.slice(0, 1)
+          phoneNumber = '84' + phoneNumber.slice(1)
         }
-        const phoneJson = {
-          phoneNumber: phoneNumber,
-          digitNumber: digitNumber
+        const userRef = db.collection('account').doc(phoneNumber);
+        const userResp = await userRef.get();
+        console.log(userResp.data());
+        if (userResp.data()) {
+          const phoneJson = {
+            digitNumber: digitNumber
+          }
+          await db.collection('account').doc(phoneNumber).update(phoneJson);
+        } else {
+          const phoneJson = {
+            phoneNumber: phoneNumber,
+            digitNumber: digitNumber,
+            favouriteList: []
+          }
+          await db.collection('account').doc(phoneNumber).set(phoneJson);
         }
-        const resp = await db.collection('account').doc(phoneNumber).set(phoneJson);
-        // console.log(resp);
         const message = "Your code is " + digitNumber;
-        sendSMS(phoneNumber, 'github search app', message);
-        res.sendStatus(200)
+        // sendSMS(phoneNumber, 'github search app', message);
+        res.status(200).send({ token: Math.floor(100000000 + Math.random() * 900000) })
       } else {
         res.status(400).send('your phone number is not valid');
       }
@@ -135,9 +145,9 @@ async function handlePostValidate(req, res, next) {
         if (accessCode.toString().match(`^[0-9]{6}$`)) {
           const userRef = db.collection('account').doc(phoneNumber);
           const resp = await userRef.get();
-          if (resp) {
+          if (resp.data()) {
             if (accessCode == resp.data().digitNumber) {
-              res.sendStatus(200);
+              res.status(200).send(resp.data());
             }
             else {
               res.status(400).send('your validation code is wrong!')
@@ -147,7 +157,7 @@ async function handlePostValidate(req, res, next) {
           }
         }
         else {
-          res.status(400).send('your validation code is not valid');
+          res.status(200).send('your validation code is not valid');
         }
       } else {
         res.status(400).send('your phone number is not valid');
@@ -165,8 +175,8 @@ async function handlePostValidate(req, res, next) {
 async function handleGetUsers(req, res, next) {
   try {
     console.log(req);
-    let { q } = req.query;
-    fetch(git.search + q).then(
+    let { q, page, per_page } = req.query;
+    fetch(`${git.search}${q}&page=${page || 1}&per_page=${per_page || 30}`).then(
       (resp) => resp.json()).then(
         (data) => {
           console.log(data);
@@ -203,6 +213,27 @@ async function handleGetUserById(req, res, next) {
 
 async function handlePostLike(req, res, next) {
   try {
+    let { id, phoneNumber } = req.body;
+    const userRef = db.collection('account').doc(phoneNumber)
+    const userRep = await userRef.get();
+    console.log(userRep.data(),id);
+    db.collection('account').doc(phoneNumber).update({
+      favouriteList: [...userRep.data().favouriteList,id]
+    });
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(400);
+  };
+}
+async function handlePostUnLike(req, res, next) {
+  try {
+    let { id, phoneNumber } = req.body;
+    const userRef = db.collection('account').doc(phoneNumber)
+    const userRep = await userRef.get();
+    db.collection('account').doc(phoneNumber).update({
+      favouriteList: userRep.data().favouriteList.filter((e)=>e!=id)
+    });
     res.sendStatus(200);
   } catch (err) {
     console.log(err);
@@ -213,17 +244,10 @@ async function handlePostLike(req, res, next) {
 async function handleGetUserProfileByPhoneNumber(req, res, next) {
   try {
     let { phone } = req.query;
-    // fetch(git.user + userID).then(
-    //   (resp) => resp.json()).then(
-    //     (data) => {
-    //       console.log(data);
-    //       res.status(200).send(data);
-    //     }
-    //   ).catch((error) => {
-    //     console.error('Error:', error);
-    //     res.sendStatus(500);
-    //   });
-    res.status(200).send({ phone: phone })
+    console.log(req);
+    const userRef = db.collection('account').doc(phone.toString())
+    const userRep = await userRef.get();
+    res.status(200).send(userRep.data())
   } catch (err) {
     console.log(err);
     res.sendStatus(400);

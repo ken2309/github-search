@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useCallback, useContext } from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -15,6 +15,10 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
+
+import { debounce } from "lodash"
+import { AppContext } from '../AppProvider';
+import usersApi from '../apis/users';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -57,6 +61,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function PrimarySearchAppBar() {
+  const { key, setListUser, setKey } = useContext(AppContext);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
@@ -153,7 +158,29 @@ export default function PrimarySearchAppBar() {
       </MenuItem>
     </Menu>
   );
-
+  const handleOnChange = (e) => {
+    onSetDebounceKeyword(e.target.value)
+  }
+  function handleKeyDown(event) {
+    if (event.code === "Enter" || event?.nativeEvent.keyCode === 13) {
+      fetchListGitAccount()
+    }
+  }
+  const onSetDebounceKeyword = useCallback(
+    debounce((text) => fetchListGitAccount(text), 1000),
+    []
+  )
+  async function fetchListGitAccount(text) {
+    try {
+      let res = await usersApi.getAll(text);
+      console.log("res =>>", res);
+      setKey(text);
+      setListUser(res.data);
+    } catch (err) {
+      alert('System errors');
+      console.log(err);
+    }
+  }
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -173,33 +200,22 @@ export default function PrimarySearchAppBar() {
             component="div"
             sx={{ display: { xs: 'none', sm: 'block' } }}
           >
-            MUI
+            Github Search Engine
           </Typography>
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
-              placeholder="Search…"
+              placeholder="Type github name"
               inputProps={{ 'aria-label': 'search' }}
+              onChange={handleOnChange}
+              onKeyDown={handleKeyDown}
+              defaultValue={key}
             />
           </Search>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-              <Badge badgeContent={4} color="error">
-                <MailIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              size="large"
-              aria-label="show 17 new notifications"
-              color="inherit"
-            >
-              <Badge badgeContent={17} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
             <IconButton
               size="large"
               edge="end"
