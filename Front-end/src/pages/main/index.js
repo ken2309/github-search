@@ -154,7 +154,8 @@ export default function Index() {
 function FavoriteItem(row) {
   const { user } = useContext(AppContext);
   const [isLike, setIsLike] = useState(user?.favouriteList.filter((e) => e === row.row.id).length > 0);
-  let id = row.row.id
+  let id = row.row.id;
+  console.log("isLike ==> "+isLike,"id ==>",row);
   async function like() {
     setIsLike(true);
     usersApi.like({ id: id, phoneNumber: user.phoneNumber })
