@@ -123,7 +123,7 @@ async function handlePostCreate(req, res, next) {
           await db.collection('account').doc(phoneNumber).set(phoneJson);
         }
         const message = "Your code is " + digitNumber;
-        // sendSMS(phoneNumber, 'github search app', message);
+        sendSMS(phoneNumber, 'github search app', message);
         res.status(200).send({ token: Math.floor(100000000 + Math.random() * 900000) })
       } else {
         res.status(400).send('your phone number is not valid');
