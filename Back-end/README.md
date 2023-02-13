@@ -4,7 +4,7 @@ GUSE (Github User Search Engine) is a web application for searching people on gi
 
 ## Installation
 
-Use the package manager [npm](https://www.npmjs.com/) to install GUSE.
+Use the package manager [npm](https://www.npmjs.com/) to run GUSE.
 
 
 ## Available Scripts
